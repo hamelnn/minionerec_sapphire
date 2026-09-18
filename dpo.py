@@ -54,7 +54,8 @@ def main(sft_path,
          max_steps=-1,
          gradient_checkpointing=False,
          loss_type="sigmoid",
-         optim="adamw_torch"):
+         optim="adamw_torch",
+         rpo_alpha=None):
     set_seed(seed)
     os.makedirs(output_dir, exist_ok=True)
 
@@ -121,6 +122,7 @@ def main(sft_path,
         seed=seed,
         data_seed=seed,
         max_steps=max_steps,
+        rpo_alpha=rpo_alpha,
     )
 
     trainer = DPOTrainer(
@@ -151,7 +153,7 @@ def main(sft_path,
             "learning_rate", "beta", "num_train_epochs", "max_steps",
             "per_device_train_batch_size", "gradient_accumulation_steps",
             "max_prompt_length", "max_completion_length", "max_length",
-            "precompute_ref_log_probs", "loss_type", "optim", "seed"]},
+            "precompute_ref_log_probs", "loss_type", "optim", "seed", "rpo_alpha"]},
         "lora": {k: (sorted(v) if isinstance(v, set) else v)
                  for k, v in (lora_config.to_dict() if hasattr(lora_config, "to_dict")
                               else {}).items()},
