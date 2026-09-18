@@ -1,0 +1,26 @@
+# ============================================================
+# MiniOneRec Windows 单卡（RTX 4070 SUPER 12GB）最小依赖集
+# 安装: pip install -r requirements_win.txt
+#
+# 与原版 requirements.txt 的差异（均为刻意省略）:
+#   - torchrec / fbgemm_gpu: 仅发布 Linux wheel，且训练主链路未使用
+#   - deepspeed: 仅多卡 accelerate 启动需要，单卡直接 python rl.py 即可
+#   - torchaudio / torchsnapshot / torcheval / torchmetrics / POT: 主链路未使用
+#   - 新增 scikit-learn: rl.py 顶部 `from sklearn.metrics import ndcg_score` 需要
+# ============================================================
+torch==2.6.0
+transformers==4.57.1
+trl==0.24.0
+accelerate==1.10.1
+datasets==4.2.0
+bitsandbytes==0.48.1
+pandas==2.2.2
+numpy==1.26.3
+pyarrow==21.0.0
+scikit-learn==1.6.1
+wandb==0.22.2
+fire==0.7.1
+PyYAML==6.0.1
+tqdm==4.67.1
+safetensors==0.6.2
+huggingface-hub==0.35.3
