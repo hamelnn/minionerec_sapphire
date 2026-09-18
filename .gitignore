@@ -5,13 +5,10 @@ __pycache__/
 .venv/
 venv/
 
-# 训练产物（单文件超过 GitHub 100MB 限制，不入库）
-outputs/sft_05b_12gb/
-outputs/sft_short/
-outputs/rl_05b_12gb/
-outputs/rl_05b_12gb_merged/
-outputs/rl_short/
-outputs/tmp_diag/
+# 训练产物不入库（checkpoint/合并模型远超 GitHub 100MB 限制）；仅保留评测结果 JSON
+outputs/*
+!outputs/eval/
+!outputs/eval/**
 
 # 日志与临时
 *.log
