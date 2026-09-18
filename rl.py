@@ -77,6 +77,7 @@ def train(
     eval_sample: int = -1,          # 训练中评测集采样，-1 为全量
     max_steps: int = -1,            # 短训练步数限制
     use_gradient_checkpointing: bool = False,  # 0.5B 显存充裕；PEFT 冻结底座+reentrant GC 会断梯度，默认关闭
+    optim: str = "adamw_torch",     # 全参 RL 建议 adamw_bnb_8bit（SFT 同款，fp32 Adam 状态 4GiB 会挤爆 12GB）
 ):
     torch.backends.cuda.enable_flash_sdp(False)  
     torch.backends.cuda.enable_mem_efficient_sdp(False)
@@ -300,7 +301,7 @@ def train(
                                 num_train_epochs=num_train_epochs,
                                 max_steps=max_steps,
                                 bf16=True,
-                                optim="adamw_torch",
+                                optim=optim,
                                 lr_scheduler_type="cosine",
                                 save_strategy="steps",
                                 report_to="none",
@@ -347,6 +348,12 @@ def train(
     if peft_config is not None:
         trainer.model.print_trainable_parameters()
         assert trainer.ref_model is None, "PEFT 路径不应创建独立参考模型"
+    else:
+        # 全参路径：ReReTrainer 内部 create_reference_model 生成冻结参考副本并 prepare 到 GPU
+        assert trainer.ref_model is not None, "全参路径应创建独立参考模型（create_reference_model）"
+        n_total = sum(p.numel() for p in trainer.model.parameters())
+        n_trainable = sum(p.numel() for p in trainer.model.parameters() if p.requires_grad)
+        print(f"full-param trainable: {n_trainable:,} / {n_total:,} ({100.0 * n_trainable / n_total:.2f}%)")
 
     torch.cuda.reset_peak_memory_stats()
 
